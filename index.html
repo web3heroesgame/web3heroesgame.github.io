@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Web3 Heroes — Closed Beta</title>
+  <meta name="description" content="Web3 Heroes is a turn-based PvP game in pixel art: collect NFT gear, build your hero, set the stake. Sign up for the closed beta.">
+  <meta name="theme-color" content="#13161d">
+  <meta name="color-scheme" content="dark">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Web3 Heroes — Closed Beta">
+  <meta property="og:description" content="Turn-based PvP in pixel art: collect NFT gear, build your hero, set the stake. Winner takes the pot.">
+  <meta property="og:image" content="https://web3heroesgame.com/assets/og-image.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <link rel="icon" type="image/png" href="assets/logo/favicon.png">
+  <link rel="apple-touch-icon" href="assets/logo/app_icon_180.png">
+  <link rel="preload" href="assets/fonts/PixelifySans.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/heroes.css">
+  <script src="js/config.js" defer></script>
+  <script src="js/heroes.js" defer></script>
+  <script src="js/main.js" defer></script>
+</head>
+<body>
+  <nav class="pager" aria-label="Pages">
+    <a class="pager__dot is-active" href="#join" aria-label="Join the beta" aria-current="true"></a>
+    <a class="pager__dot" href="#battle" aria-label="The battle"></a>
+    <a class="pager__dot" href="#loot" aria-label="The loot"></a>
+    <a class="pager__dot" href="#chain" aria-label="On-chain loot"></a>
+  </nav>
+
+  <main>
+    <!-- Page 1: brand + beta registration -->
+    <section class="slide slide--join" id="join" aria-labelledby="join-title">
+      <div class="slide__inner join">
+        <header class="join__brand">
+          <h1 class="join__logo">
+            <img src="assets/logo/wordmark.png" width="212" height="68" alt="Web3 Heroes">
+          </h1>
+          <p class="join__tagline">Turn-based PvP in pixel art: collect NFT gear, build your hero, set the stake. Winner takes the pot.</p>
+        </header>
+
+        <!--
+          Sign-ups go to the sign-up Worker (its address is in js/config.js), which checks the
+          Cloudflare Turnstile captcha and passes the answers on to a Google Form. The wallet comes only from Connect
+          (the visitor's wallet) into the hidden input; js/main.js sends the form in the background and shows the result.
+        -->
+        <form class="panel beta-form" id="beta-form" aria-labelledby="join-title" method="post">
+          <h2 class="panel__title" id="join-title">Join the closed beta</h2>
+          <p class="panel__text">Get an invite when the gates open.</p>
+
+          <fieldset class="beta-form__fields">
+            <legend class="visually-hidden">Beta sign-up</legend>
+
+            <label class="form-label" for="f-wallet">Web3 wallet</label>
+            <div class="field-row">
+              <input class="field" id="f-wallet" type="text" placeholder="Not connected" readonly>
+              <input id="f-wallet-value" name="wallet" type="hidden">
+              <button class="btn btn--secondary field-row__button" id="f-wallet-connect" type="button">
+                <img src="assets/icons/wallet.png" width="32" height="32" alt=""><span>Connect</span>
+              </button>
+            </div>
+            <p class="form-hint" id="f-wallet-hint" aria-live="polite" hidden></p>
+
+            <label class="form-label" for="f-x">X (Twitter) page</label>
+            <input class="field" id="f-x" name="x" type="text" placeholder="x.com/yourname" pattern="@?[A-Za-z0-9_]{1,15}|(https?://)?(www\.)?(x|twitter)\.com/[A-Za-z0-9_]{1,15}/?" title="Your X handle or profile link, like x.com/yourname" spellcheck="false" autocomplete="off" required>
+            <p class="form-tip">Your X profile should follow <a href="https://x.com/web3heroes_game" target="_blank" rel="noopener">@web3heroes_game</a>.</p>
+
+            <label class="form-label" for="f-referral">Referral code <span class="form-label__hint">(optional)</span></label>
+            <input class="field" id="f-referral" name="referral" type="text" maxlength="32" spellcheck="false" autocomplete="off">
+
+            <!-- A trap for bots: people never see it, so a filled-in value means the sign-up is dropped. -->
+            <div class="beta-form__trap" aria-hidden="true">
+              <label for="f-trap">Leave this empty</label>
+              <input id="f-trap" type="text" tabindex="-1" autocomplete="off">
+            </div>
+
+            <!-- The Cloudflare Turnstile captcha (js/main.js): out of sight unless Cloudflare wants a click. -->
+            <div class="beta-form__captcha" id="f-captcha"></div>
+
+            <button class="btn btn--primary beta-form__submit" type="submit">Join the beta</button>
+          </fieldset>
+
+          <noscript><p class="form-hint">Signing up needs JavaScript.</p></noscript>
+          <p class="beta-form__note">We use your wallet and X only for beta invites.</p>
+          <p class="notice notice--success" role="status" hidden>
+            <img src="assets/icons/notice-success.png" width="32" height="32" alt="">
+            <span>Thanks! You're on the beta list.</span>
+          </p>
+          <p class="notice notice--error" role="alert" hidden>
+            <img src="assets/icons/notice-error.png" width="32" height="32" alt="">
+            <span>Couldn't send. Please try again.</span>
+          </p>
+        </form>
+      </div>
+
+      <a class="next-arrow" href="#battle">
+        <span class="next-arrow__label">The battle</span>
+        <span class="next-arrow__btn"><img src="assets/icons/chevron-down.png" width="32" height="32" alt=""></span>
+        <span class="visually-hidden">Next page</span>
+      </a>
+    </section>
+
+    <!-- Page 2: how a fight works -->
+    <section class="slide slide--battle" id="battle" aria-labelledby="battle-title">
+      <div class="slide__inner battle">
+        <div class="battle__copy">
+          <p class="eyebrow"><img src="assets/icons/stat-damage.png" width="32" height="32" alt="">Turn-based tactics</p>
+          <h2 class="title" id="battle-title">Every turn counts</h2>
+          <p class="lead">Two squads meet on a grid. Initiative decides who goes first. On your turn you have 60 seconds to move, attack and defend: all three in one turn.</p>
+        </div>
+
+        <!-- Heroes: the game's rig frames (css/heroes.css, js/heroes.js); a .unit is the hero's feet point.
+             The squads run in when the page opens; then the archer shoots the wanderer and the assassin stabs the knight (js/main.js). -->
+        <div class="battle__scene" aria-hidden="true">
+          <div class="unit unit--blue unit--archer" data-hero="archer"><div class="hero hero--archer"></div></div>
+          <div class="unit unit--red unit--wanderer" data-hero="wanderer"><div class="hero hero--wanderer"></div></div>
+          <div class="unit unit--blue unit--knight" data-hero="knight"><div class="hero hero--knight"></div></div>
+          <div class="unit unit--red unit--assassin" data-hero="assassin"><div class="hero hero--assassin"></div></div>
+        </div>
+
+        <ul class="actions">
+          <li class="action">
+            <span class="slot"><img src="assets/icons/move.png" width="30" height="36" alt=""></span>
+            <div>
+              <h3 class="action__name">Move</h3>
+              <p class="action__text">Cross the field. Rocks, trees and living foes stand in your way.</p>
+            </div>
+          </li>
+          <li class="action">
+            <span class="slot"><img src="assets/icons/stat-damage.png" width="32" height="32" alt=""></span>
+            <div>
+              <h3 class="action__name">Attack</h3>
+              <p class="action__text">Strike up close or shoot from range. Aim at the head, body or legs.</p>
+            </div>
+          </li>
+          <li class="action">
+            <span class="slot"><img src="assets/icons/defend.png" width="32" height="32" alt=""></span>
+            <div>
+              <h3 class="action__name">Defend</h3>
+              <p class="action__text">Raise your guard over one part of the body until your next turn.</p>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <a class="next-arrow" href="#loot">
+        <span class="next-arrow__label">The loot</span>
+        <span class="next-arrow__btn"><img src="assets/icons/chevron-down.png" width="32" height="32" alt=""></span>
+        <span class="visually-hidden">Next page</span>
+      </a>
+    </section>
+
+    <!-- Page 3: the pack, items and stats -->
+    <section class="slide slide--loot" id="loot" aria-labelledby="loot-title">
+      <div class="slide__inner loot">
+        <img class="loot__pack" src="assets/shop/nft-pack.png" width="112" height="176" alt="">
+
+        <ul class="loot__items">
+          <li class="item item--common">
+            <span class="item__frame"><img src="assets/items/wanderer-sword.png" width="58" height="58" alt="Short Sword"></span>
+            <span class="item__rarity">Common</span>
+          </li>
+          <li class="item item--uncommon">
+            <span class="item__frame"><img src="assets/items/archer-hood.png" width="58" height="54" alt="Ranger Hood"></span>
+            <span class="item__rarity">Uncommon</span>
+          </li>
+          <li class="item item--rare">
+            <span class="item__frame"><img src="assets/items/knight-cuirass.png" width="48" height="66" alt="Steel Cuirass"></span>
+            <span class="item__rarity">Rare</span>
+          </li>
+          <li class="item item--epic">
+            <span class="item__frame"><img src="assets/items/archer-longbow.png" width="57" height="57" alt="Longbow"></span>
+            <span class="item__rarity">Epic</span>
+          </li>
+          <li class="item item--legendary">
+            <span class="item__frame"><img src="assets/items/knight-helm.png" width="48" height="52" alt="Iron Helm"></span>
+            <span class="item__rarity">Legendary</span>
+          </li>
+        </ul>
+
+        <div class="stats">
+          <h3 class="stats__title" id="loot-title">Every item adds to your hero's final stats</h3>
+          <ul class="stats__list">
+            <li class="stat">
+              <img src="assets/icons/stat-hp.png" width="32" height="32" alt="">
+              <p><span class="stat__name">Hit Points</span> how long you last on the battlefield</p>
+            </li>
+            <li class="stat">
+              <img src="assets/icons/stat-damage.png" width="32" height="32" alt="">
+              <p><span class="stat__name">Damage</span> how much HP the enemy loses per hit</p>
+            </li>
+            <li class="stat">
+              <img src="assets/icons/stat-protection.png" width="32" height="32" alt="">
+              <p><span class="stat__name">Protection</span> how well each part of your body is protected</p>
+            </li>
+            <li class="stat">
+              <img src="assets/icons/stat-distance.png" width="32" height="32" alt="">
+              <p><span class="stat__name">Distance</span> the range of your attack</p>
+            </li>
+            <li class="stat">
+              <img src="assets/icons/stat-initiative.png" width="32" height="32" alt="">
+              <p><span class="stat__name">Initiative</span> your place in the turn order</p>
+            </li>
+            <li class="stat">
+              <img src="assets/icons/stat-dexterity.png" width="32" height="32" alt="">
+              <p><span class="stat__name">Dexterity</span> chance to avoid taking damage</p>
+            </li>
+            <li class="stat">
+              <img src="assets/icons/stat-crit.png" width="32" height="32" alt="">
+              <p><span class="stat__name">Critical Hit Chance</span> chance to deal double damage</p>
+            </li>
+            <li class="stat">
+              <img src="assets/icons/stat-speed.png" width="32" height="32" alt="">
+              <p><span class="stat__name">Speed</span> how far you can move on the field</p>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <a class="next-arrow" href="#chain">
+        <span class="next-arrow__label">On-chain</span>
+        <span class="next-arrow__btn"><img src="assets/icons/chevron-down.png" width="32" height="32" alt=""></span>
+        <span class="visually-hidden">Next page</span>
+      </a>
+    </section>
+
+    <section class="slide slide--chain" id="chain" aria-labelledby="chain-title">
+      <div class="slide__inner chain">
+        <p class="eyebrow"><img src="assets/icons/chain.png" width="32" height="32" alt="">On-chain loot</p>
+        <h2 class="title" id="chain-title">Your gear. Your wallet.</h2>
+        <p class="lead">Every helm, blade and cloak you earn is a real token. Fight with it in the arena, take it to your wallet, bring it back whenever you like.</p>
+
+        <ul class="features">
+          <li class="feature">
+            <span class="slot"><img src="assets/icons/deposit.png" width="32" height="32" alt=""></span>
+            <div>
+              <h3 class="feature__name">Items are NFTs</h3>
+              <p class="feature__text">Withdraw any item as an ERC-1155 token, trade it, deposit it back to equip it again.</p>
+            </div>
+          </li>
+          <li class="feature">
+            <span class="slot"><img src="assets/icons/gem.png" width="32" height="32" alt=""></span>
+            <div>
+              <h3 class="feature__name">Packs and rarities</h3>
+              <p class="feature__text">Open packs on-chain with a fair draw. Five rarities, from Common to Legendary.</p>
+            </div>
+          </li>
+          <li class="feature">
+            <span class="slot"><img src="assets/icons/coin.png" width="32" height="32" alt=""></span>
+            <div>
+              <h3 class="feature__name">Stakes in the arena</h3>
+              <p class="feature__text">The lobby host sets the entry price. The winning squad takes the pot.</p>
+            </div>
+          </li>
+          <li class="feature">
+            <span class="slot"><img src="assets/icons/chain.png" width="32" height="32" alt=""></span>
+            <div>
+              <h3 class="feature__name">Runs on Robinhood Chain</h3>
+              <p class="feature__text">Items and packs live on an Ethereum layer 2: fast transactions, small fees in ETH.</p>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <div class="slide__foot">
+        <a class="btn btn--primary chain__cta" href="#join">
+          <img src="assets/icons/chevron-up.png" width="32" height="32" alt="">Join the beta
+        </a>
+        <footer class="site-footer">Web3 Heroes 2026 · Closed beta coming soon</footer>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

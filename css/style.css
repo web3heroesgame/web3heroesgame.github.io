@@ -1,0 +1,1154 @@
+/*
+ * Web3 Heroes beta landing.
+ * All art comes from the game: UI kit PNGs are 2 css px per art pixel and are drawn as 9-slice frames with the
+ * game's slice margins. Heroes, backdrops and items are scaled by whole numbers.
+ *
+ * Layouts: "tall" desktop (default), "short" desktop for laptop screens under 860 px high, tablet (< 900 px wide)
+ * and phone (< 600 px wide). Desktop pages fit one screen each; on tablets and phones a page may scroll inside.
+ */
+
+@font-face {
+  font-family: "Pixelify Sans";
+  src: url("../assets/fonts/PixelifySans.ttf") format("truetype");
+  font-weight: 400 700;
+  font-display: swap;
+}
+
+:root {
+  /* The game's palette */
+  --bg: #0b0d12;
+  --page: #13161d;
+  --panel-light: #2a2d36;
+  --border: #4b5162;
+  --outline: #0d0f14;
+  --gold: #d4af6a;
+  --gold-light: #e4bc74;
+  --gold-pale: #f2dca0;
+  --gold-dark: #6e5530;
+  --gold-darkest: #2e2213;
+  --text: #e7e9ee;
+  --muted: #8a93a8;
+
+  /* Rarity colours */
+  --common: #9d9d9d;
+  --uncommon: #1eff00;
+  --rare: #0070dd;
+  --epic: #a335ee;
+  --legendary: #ff8000;
+
+  --gutter: 16px;
+  --hs: 3; /* hero sprite scale */
+  --shade: 11, 13, 18;
+  --text-outline:
+    2px 0 var(--outline), -2px 0 var(--outline), 0 2px var(--outline), 0 -2px var(--outline),
+    2px 2px var(--outline), -2px 2px var(--outline), 2px -2px var(--outline), -2px -2px var(--outline);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+  background: var(--bg);
+  image-rendering: pixelated;
+}
+
+body {
+  margin: 0;
+  font-family: "Pixelify Sans", "Courier New", monospace;
+  font-size: 20px;
+  line-height: 1.35;
+  color: var(--text);
+  background: var(--bg);
+}
+
+h1,
+h2,
+h3,
+p,
+ul {
+  margin: 0;
+}
+
+ul {
+  padding: 0;
+  list-style: none;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+:focus-visible {
+  outline: 2px solid var(--gold-pale);
+  outline-offset: 3px;
+}
+
+/* Elements styled with a display value would otherwise ignore the hidden attribute. */
+[hidden] {
+  display: none !important;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---------- Slider ---------- */
+
+.slide {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  min-height: 100svh;
+  padding: 40px var(--gutter) 104px;
+  overflow: hidden;
+  scroll-snap-align: start;
+  isolation: isolate;
+  background-color: var(--page);
+  background-repeat: no-repeat;
+}
+
+.slide__inner {
+  width: 100%;
+  max-width: 1240px;
+}
+
+.pager {
+  position: fixed;
+  top: 50%;
+  right: 20px;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transform: translateY(-50%);
+}
+
+.pager__dot {
+  display: block;
+  width: 16px;
+  height: 16px;
+  background: var(--panel-light);
+  border: 2px solid var(--outline);
+  box-shadow: inset 2px 2px 0 var(--border);
+}
+
+.pager__dot:hover {
+  background: var(--gold-dark);
+}
+
+.pager__dot.is-active {
+  background: var(--gold);
+  box-shadow: inset 2px 2px 0 var(--gold-pale), inset -2px -2px 0 var(--gold-dark);
+}
+
+.next-arrow {
+  position: absolute;
+  right: 32px;
+  bottom: 24px;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 18px;
+  color: var(--gold);
+  text-decoration: none;
+  text-shadow: var(--text-outline);
+}
+
+.next-arrow__btn {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border: 8px solid transparent;
+  border-image: url("../assets/ui/btn-icon.png") 8 6 fill / 8px 6px;
+}
+
+.next-arrow:hover .next-arrow__btn {
+  border-image: url("../assets/ui/btn-icon-hover.png") 8 fill / 8px;
+}
+
+.next-arrow:active .next-arrow__btn {
+  border-image: url("../assets/ui/btn-icon-pressed.png") 8 fill / 8px;
+}
+
+.next-arrow__btn img {
+  width: 32px;
+  height: 32px;
+  animation: nudge 1.2s steps(5, jump-none) infinite alternate;
+}
+
+@keyframes nudge {
+  from {
+    transform: translateY(-4px);
+  }
+
+  to {
+    transform: translateY(4px);
+  }
+}
+
+/* ---------- Shared pieces ---------- */
+
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 18px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--gold);
+  text-shadow: var(--text-outline);
+}
+
+.eyebrow img {
+  width: 32px;
+  height: 32px;
+}
+
+.title {
+  margin-top: 10px;
+  font-size: clamp(40px, min(4.6vw, 6.4vh), 64px);
+  font-weight: 700;
+  line-height: 1.05;
+  color: var(--gold-light);
+  text-shadow:
+    3px 0 var(--outline), -3px 0 var(--outline), 0 3px var(--outline), 0 -3px var(--outline),
+    3px 3px var(--outline), -3px 3px var(--outline), 3px -3px var(--outline), -3px -3px var(--outline),
+    0 7px rgba(0, 0, 0, 0.45);
+}
+
+.lead {
+  margin-top: 14px;
+  font-size: clamp(18px, 2.4vh, 22px);
+  text-shadow: var(--text-outline);
+}
+
+.slot {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 60px;
+  height: 60px;
+  border: 8px solid transparent;
+  border-image: url("../assets/ui/inset.png") 14 fill / 14px;
+}
+
+.slot img {
+  max-width: none;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 52px;
+  padding: 2px 14px 4px;
+  font: inherit;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1;
+  text-decoration: none;
+  cursor: pointer;
+  background: none;
+  border: 8px solid transparent;
+  border-radius: 0;
+}
+
+.btn img {
+  width: 32px;
+  height: 32px;
+}
+
+.btn--primary {
+  color: var(--page);
+  border-image: url("../assets/ui/btn-primary.png") 8 10 10 fill / 8px 10px 10px;
+}
+
+.btn--primary:not(:disabled):hover {
+  border-image: url("../assets/ui/btn-primary-hover.png") 10 8 8 fill / 10px 8px 8px;
+}
+
+.btn--primary:not(:disabled):active {
+  padding: 4px 14px 2px;
+  color: var(--gold-darkest);
+  border-image: url("../assets/ui/btn-primary-pressed.png") 8 fill / 8px;
+}
+
+.btn--primary:disabled {
+  color: rgba(46, 34, 19, 0.75);
+  cursor: not-allowed;
+  border-image: url("../assets/ui/btn-primary-disabled.png") 8 fill / 8px;
+}
+
+/*
+ * ---------- Units: a hero of the game's rig standing in its squad's HP ring ----------
+ * A .unit is the hero's feet point (no size). .hero shows one frame of the hero's sheet (css/heroes.css: frame
+ * --fw x --fh art px with the feet at --fx, --fy); js/main.js steps --row (the animation) and --col (the frame).
+ * The red squad faces left: the sprite is mirrored around the feet, like the game's billboard.
+ */
+
+.unit {
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+
+.hero {
+  position: absolute;
+  top: calc(var(--fy) * var(--hs) * -1px);
+  left: calc(var(--fx) * var(--hs) * -1px);
+  width: calc(var(--fw) * var(--hs) * 1px);
+  height: calc(var(--fh) * var(--hs) * 1px);
+  background-repeat: no-repeat;
+  background-position:
+    calc(var(--col, 0) * var(--fw) * var(--hs) * -1px)
+    calc(var(--row, 0) * var(--fh) * var(--hs) * -1px);
+  background-size: calc(var(--sw) * var(--hs) * 1px) calc(var(--sh) * var(--hs) * 1px);
+}
+
+.unit--red .hero {
+  transform: scaleX(-1);
+  transform-origin: calc(var(--fx) * var(--hs) * 1px) 0;
+}
+
+/* The HP ring (drawn by js/main.js): 55 x 25 art px around the feet. */
+.ring {
+  position: absolute;
+  top: calc(-12px * var(--hs));
+  left: calc(-27px * var(--hs));
+  width: calc(55px * var(--hs));
+  height: calc(25px * var(--hs));
+}
+
+/* ---------- Page 1: join ---------- */
+
+.slide--join {
+  background-image:
+    linear-gradient(180deg, rgba(var(--shade), 0.1) 0%, rgba(var(--shade), 0.35) 60%, rgba(var(--shade), 0.92) 100%),
+    url("../assets/bg/castle-gate.png");
+  background-position: center, center top;
+  background-size: auto, cover;
+}
+
+/* Tall: the brand above the form, which stands in the castle gate. */
+.join {
+  display: grid;
+  grid-template-areas:
+    "brand"
+    "form";
+  grid-template-columns: minmax(0, 1fr);
+  gap: 20px;
+  justify-items: center;
+}
+
+.join__brand {
+  display: flex;
+  flex-direction: column;
+  grid-area: brand;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+}
+
+.join__logo img {
+  width: 424px;
+  filter: drop-shadow(0 6px 0 rgba(0, 0, 0, 0.45));
+}
+
+.join__tagline {
+  font-size: 26px;
+  color: var(--gold-pale);
+  text-shadow: var(--text-outline);
+}
+
+.panel {
+  width: 100%;
+  padding: 14px 20px 20px;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 22px 12px 12px;
+  border-image: url("../assets/ui/modal.png") 22 12 12 fill / 22px 12px 12px;
+}
+
+.beta-form {
+  grid-area: form;
+  max-width: 560px;
+}
+
+.panel__title {
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--gold);
+  text-align: center;
+  text-shadow: 0 3px 0 var(--outline);
+}
+
+.panel__text {
+  margin-top: 8px;
+  font-size: 18px;
+  color: var(--muted);
+  text-align: center;
+}
+
+.beta-form__fields {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  margin: 16px 0 0;
+  padding: 0;
+  border: 0;
+}
+
+.form-label {
+  margin-top: 8px;
+  font-size: 18px;
+  color: var(--gold);
+}
+
+.form-label:first-of-type {
+  margin-top: 0;
+}
+
+.form-label__hint {
+  color: var(--muted);
+}
+
+.field {
+  display: block;
+  width: 100%;
+  height: 48px;
+  margin: 0;
+  padding: 0 8px;
+  font: inherit;
+  font-size: 20px;
+  color: var(--text);
+  caret-color: var(--gold);
+  background: none;
+  border: 6px solid transparent;
+  border-radius: 0;
+  border-image: url("../assets/ui/field.png") 6 fill / 6px;
+  outline: none;
+  appearance: none;
+}
+
+.field::placeholder {
+  color: var(--muted);
+  opacity: 0.8;
+}
+
+.field:focus {
+  border-image-source: url("../assets/ui/field-focus.png");
+}
+
+.field:disabled {
+  color: var(--muted);
+  -webkit-text-fill-color: var(--muted);
+  cursor: not-allowed;
+  border-image: url("../assets/ui/field-disabled.png") 4 fill / 4px;
+  opacity: 1;
+}
+
+.beta-form__submit {
+  width: 100%;
+  margin-top: 14px;
+}
+
+/* The kit's secondary button. */
+.btn--secondary {
+  color: var(--text);
+  border-image: url("../assets/ui/btn-secondary.png") 8 fill / 8px;
+}
+
+.btn--secondary:not(:disabled):hover {
+  border-image-source: url("../assets/ui/btn-secondary-hover.png");
+}
+
+.btn--secondary:not(:disabled):active {
+  border-image: url("../assets/ui/btn-secondary-pressed.png") 4 fill / 4px;
+}
+
+.btn--secondary:disabled {
+  color: var(--muted);
+  cursor: not-allowed;
+  border-image: url("../assets/ui/btn-secondary-disabled.png") 6 8 8 fill / 6px 8px 8px;
+}
+
+/* The wallet field and its Connect button: side by side, the same height (48 px: the button's 8 px frame around its
+   32 px icon). */
+.field-row {
+  display: flex;
+  gap: 8px;
+}
+
+.field-row .field {
+  flex: 1;
+  min-width: 0;
+}
+
+.field:read-only {
+  cursor: default;
+}
+
+.field-row__button {
+  flex: none;
+  gap: 6px;
+  height: 48px;
+  min-height: 0;
+  padding: 0 10px;
+  font-size: 18px;
+}
+
+/* A message under a field (form-hint, shown when needed) or a standing tip (form-tip). */
+.form-hint,
+.form-tip {
+  font-size: 15px;
+  color: var(--muted);
+}
+
+.form-hint.is-error {
+  color: #e0524d;
+}
+
+.form-hint a,
+.form-tip a {
+  color: var(--gold-pale);
+}
+
+/* Kept off screen rather than hidden, so bots that skip hidden fields still fill it in. */
+.beta-form__trap {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+/* The Turnstile captcha has no height until Cloudflare wants a click, so it gives back its gap in the column. */
+.beta-form__captcha {
+  margin-bottom: -6px;
+}
+
+.beta-form__note {
+  margin-top: 12px;
+  font-size: 16px;
+  color: var(--muted);
+  text-align: center;
+}
+
+/* The game's notice banners (success / error). */
+.notice {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+  padding: 2px 4px 2px 6px;
+  font-size: 18px;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 8px 8px 6px 16px;
+  border-image: url("../assets/ui/banner-success.png") 8 8 6 16 fill / 8px 8px 6px 16px;
+}
+
+.notice--error {
+  border-image-source: url("../assets/ui/banner-error.png");
+}
+
+.notice img {
+  flex: none;
+  width: 32px;
+  height: 32px;
+}
+
+/* ---------- Page 2: battle ---------- */
+
+.slide--battle {
+  background-image:
+    linear-gradient(90deg, rgba(var(--shade), 0.92) 0%, rgba(var(--shade), 0.8) 34%, rgba(var(--shade), 0) 58%),
+    linear-gradient(0deg, rgba(var(--shade), 0.92) 0%, rgba(var(--shade), 0.55) 24%, rgba(var(--shade), 0) 46%),
+    linear-gradient(180deg, rgba(var(--shade), 0.5) 0%, rgba(var(--shade), 0) 20%),
+    url("../assets/bg/elven-glade.png");
+  background-position: center, center, center, center bottom;
+  background-size: auto, auto, auto, cover;
+}
+
+.battle {
+  display: grid;
+  grid-template-areas:
+    "copy scene"
+    "actions actions";
+  grid-template-columns: minmax(0, 560px) minmax(0, 1fr);
+  column-gap: 48px;
+  align-items: center;
+}
+
+.battle__copy {
+  grid-area: copy;
+}
+
+/*
+ * A small board: the archer and the wanderer on the far row, the knight and the assassin face to face on the near
+ * row, 74 art px apart (a little more than the game's 62 px cell). Positions are the heroes' feet.
+ */
+.battle__scene {
+  position: relative;
+  grid-area: scene;
+  height: calc(154px * var(--hs));
+}
+
+.unit--archer,
+.unit--wanderer {
+  top: calc(84px * var(--hs));
+  z-index: 1;
+}
+
+.unit--archer {
+  left: 7%;
+}
+
+.unit--wanderer {
+  left: 93%;
+}
+
+.unit--knight,
+.unit--assassin {
+  top: calc(140px * var(--hs));
+  z-index: 2;
+}
+
+.unit--knight {
+  left: calc(50% - 37px * var(--hs));
+}
+
+.unit--assassin {
+  left: calc(50% + 37px * var(--hs));
+}
+
+/* Battle effects (js/main.js), sized in art px like the heroes. */
+.fx {
+  position: absolute;
+  z-index: 3;
+  max-width: none;
+  pointer-events: none;
+}
+
+.fx--arrow {
+  width: calc(6px * var(--hs));
+  height: calc(1px * var(--hs));
+  background: #fff;
+  transform-origin: 0 50%;
+}
+
+.fx--flip {
+  transform: scaleX(-1);
+}
+
+.fx--damage {
+  z-index: 4;
+  font-size: calc(18px * var(--hs));
+  font-weight: 700;
+  line-height: 1;
+  color: #ff4d4d;
+  white-space: nowrap;
+  text-shadow:
+    3px 0 var(--outline), -3px 0 var(--outline), 0 3px var(--outline), 0 -3px var(--outline),
+    3px 3px var(--outline), -3px 3px var(--outline), 3px -3px var(--outline), -3px -3px var(--outline);
+  transform: translate(-50%, -100%);
+}
+
+.actions {
+  display: grid;
+  grid-area: actions;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.action {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 4px 8px;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 12px;
+  border-image: url("../assets/ui/card.png") 24 fill / 24px;
+}
+
+.action__name {
+  font-size: 22px;
+  color: var(--gold);
+}
+
+.action__text {
+  font-size: 17px;
+}
+
+/* ---------- Page 3: loot ---------- */
+
+.slide--loot,
+.slide--chain {
+  background-image:
+    radial-gradient(ellipse 50% 60% at 50% 50%, rgba(212, 175, 106, 0.14), rgba(212, 175, 106, 0) 70%),
+    linear-gradient(180deg, rgba(var(--shade), 0.25), rgba(var(--shade), 0.75)),
+    url("../assets/bg/page-tile.png");
+  background-repeat: no-repeat, no-repeat, repeat;
+  background-size: auto, auto, 62px 62px;
+}
+
+.loot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+/* The pack is 56 x 88 art px: 168 px wide keeps them whole (3 px). */
+.loot__pack {
+  width: 168px;
+  filter: drop-shadow(0 8px 0 rgba(0, 0, 0, 0.5));
+  animation: hover-pack 3s steps(4, jump-none) infinite alternate;
+}
+
+@keyframes hover-pack {
+  from {
+    transform: translateY(0);
+  }
+
+  to {
+    transform: translateY(-6px);
+  }
+}
+
+.loot__items {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px 14px;
+}
+
+/* The game's opened-pack cell: the preview frame, the rarity outline (3 px, 2 px off the frame) and
+   the rarity under it in the rarity's colour. */
+.item {
+  --rarity: var(--common);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.item__frame {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 112px;
+  height: 112px;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 14px 20px;
+  border-image: url("../assets/ui/preview-frame.png") 14 20 fill / 14px 20px;
+  outline: 3px solid var(--rarity);
+  outline-offset: 2px;
+}
+
+.item__frame img {
+  flex: none;
+  max-width: none;
+}
+
+.item__rarity {
+  font-size: 16px;
+  line-height: 1;
+  color: var(--rarity);
+  text-shadow: var(--text-outline);
+}
+
+.item--uncommon {
+  --rarity: var(--uncommon);
+}
+
+.item--rare {
+  --rarity: var(--rare);
+}
+
+.item--epic {
+  --rarity: var(--epic);
+}
+
+.item--legendary {
+  --rarity: var(--legendary);
+}
+
+.stats {
+  width: 100%;
+  max-width: 660px;
+}
+
+.stats__title {
+  font-size: 20px;
+  font-weight: 400;
+  color: var(--gold);
+  text-align: center;
+  text-shadow: var(--text-outline);
+}
+
+.stats__list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 24px;
+  margin-top: 12px;
+}
+
+.stat {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+  line-height: 1.2;
+  text-shadow: var(--text-outline);
+}
+
+.stat img {
+  flex: none;
+  width: 32px;
+  height: 32px;
+}
+
+.stat__name {
+  display: block;
+  font-size: 18px;
+  color: var(--gold-pale);
+}
+
+.slide--chain {
+  padding-bottom: 160px;
+}
+
+.chain {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 1000px;
+  text-align: center;
+}
+
+.chain .lead {
+  max-width: 760px;
+}
+
+.features {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px 40px;
+  width: 100%;
+  margin-top: 36px;
+  text-align: left;
+}
+
+.feature {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.feature__name {
+  font-size: 22px;
+  color: var(--gold);
+}
+
+.feature__text {
+  font-size: 18px;
+}
+
+.slide__foot {
+  position: absolute;
+  right: var(--gutter);
+  bottom: 24px;
+  left: var(--gutter);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.chain__cta {
+  min-width: 280px;
+}
+
+.site-footer {
+  font-size: 16px;
+  color: var(--muted);
+  text-align: center;
+}
+
+/* ---------- Entrance: each page's content rises in once it scrolls into view ---------- */
+
+.js .slide__inner > * {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.5s ease, transform 0.5s steps(4, jump-none);
+}
+
+.js .slide.is-revealed .slide__inner > * {
+  opacity: 1;
+  transform: none;
+}
+
+.js .slide.is-revealed .slide__inner > :nth-child(n + 2) {
+  transition-delay: 0.12s;
+}
+
+.js .slide.is-revealed .slide__inner > :nth-child(n + 3) {
+  transition-delay: 0.24s;
+}
+
+/* The battle scene has its own entrance: the squads run in (js/main.js). */
+.js .slide__inner > .battle__scene {
+  opacity: 1;
+  transform: none;
+  transition: none;
+}
+
+/* ---------- Responsive ---------- */
+
+@media (min-width: 1200px) and (min-height: 940px) {
+  .join__logo img {
+    width: 636px;
+  }
+}
+
+/* Large monitors at 100 % scaling: grow the content 1.5x, which keeps the kit's 2 px art pixels whole (3 px). */
+@media (min-width: 2200px) and (min-height: 1200px) {
+  :root {
+    --hs: 2;
+  }
+
+  .slide__inner {
+    zoom: 1.5;
+  }
+
+  .join__logo img {
+    width: 424px;
+  }
+}
+
+/* Desktop: keep content clear of the pager on the right. */
+@media (min-width: 900px) {
+  .slide {
+    padding-right: 56px;
+    padding-left: 56px;
+  }
+}
+
+/* Narrow desktop: smaller heroes and pack. */
+@media (max-width: 1199px) {
+  :root {
+    --hs: 2;
+  }
+
+  .battle {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .loot__pack {
+    width: 112px;
+  }
+}
+
+/* Short desktop (laptops): the brand on the left, the form on the right. */
+@media (min-width: 900px) and (max-height: 859px) {
+  :root {
+    --hs: 2;
+  }
+
+  .slide {
+    padding-top: 24px;
+    padding-bottom: 88px;
+  }
+
+  .join {
+    grid-template-areas: "brand . form";
+    grid-template-columns: minmax(0, 1fr) 40px minmax(0, 520px);
+    gap: 0;
+    align-items: center;
+  }
+
+  .slide--loot {
+    padding-bottom: 72px;
+  }
+
+  .slide--chain {
+    padding-bottom: 136px;
+  }
+
+  .loot {
+    gap: 12px;
+  }
+
+  .features {
+    margin-top: 28px;
+  }
+
+  .loot__pack {
+    width: 112px;
+  }
+
+  .stats__title {
+    font-size: 18px;
+  }
+
+  .stats__list {
+    gap: 8px 24px;
+    margin-top: 10px;
+  }
+
+  .stat__name {
+    display: inline;
+    margin-right: 4px;
+  }
+}
+
+/* Short and narrow desktop: a narrower form, so the 424 px wordmark still fits beside it at whole pixels. */
+@media (min-width: 900px) and (max-width: 1199px) and (max-height: 859px) {
+  .join {
+    grid-template-columns: minmax(0, 1fr) 40px minmax(0, 420px);
+  }
+}
+
+/* Tablet: one column. */
+@media (max-width: 899px) {
+  .battle {
+    grid-template-areas:
+      "copy"
+      "scene"
+      "actions";
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .battle__scene {
+    margin-top: 16px;
+  }
+
+  .slide--battle {
+    background-image:
+      linear-gradient(180deg, rgba(var(--shade), 0.94) 0%, rgba(var(--shade), 0.8) 30%, rgba(var(--shade), 0.1) 45%, rgba(var(--shade), 0.1) 62%, rgba(var(--shade), 0.85) 75%),
+      url("../assets/bg/elven-glade.png");
+    background-position: center, center bottom;
+    background-size: auto, cover;
+  }
+
+  .actions {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .features {
+    grid-template-columns: minmax(0, 1fr);
+    max-width: 560px;
+    gap: 16px;
+    margin-top: 28px;
+  }
+
+  .pager {
+    display: none;
+  }
+}
+
+@media (max-width: 599px) {
+  body {
+    font-size: 18px;
+  }
+
+  .slide {
+    padding: 32px var(--gutter) 96px;
+  }
+
+  .slide--chain {
+    padding-bottom: 152px;
+  }
+
+  .join__logo img {
+    width: 100%;
+  }
+
+  .join__tagline {
+    font-size: 22px;
+  }
+
+  .panel {
+    padding: 10px 12px 14px;
+  }
+
+  .panel__title {
+    font-size: 26px;
+  }
+
+  .stats__list {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .next-arrow {
+    right: var(--gutter);
+    bottom: 20px;
+  }
+
+  .next-arrow__label {
+    display: none;
+  }
+
+  .slide__foot {
+    bottom: 16px;
+    gap: 10px;
+  }
+
+  .site-footer {
+    font-size: 14px;
+  }
+}
+
+/* Where a page can be taller than the screen, let it scroll freely inside instead of snapping past it. */
+@media (max-width: 899px), (max-height: 600px) {
+  html {
+    scroll-snap-type: y proximity;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .js .slide__inner > * {
+    opacity: 1;
+    transform: none;
+  }
+}

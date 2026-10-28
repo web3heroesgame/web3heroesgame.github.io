@@ -1,0 +1,45 @@
+/* Generated from the game's hero rig. Do not edit by hand. */
+
+.hero--knight {
+  --fw: 128;
+  --fh: 101;
+  --fx: 58;
+  --fy: 99;
+  --sw: 1536;
+  --sh: 404;
+
+  background-image: url("../assets/heroes/knight.png");
+}
+
+.hero--wanderer {
+  --fw: 114;
+  --fh: 85;
+  --fx: 53;
+  --fy: 82;
+  --sw: 1368;
+  --sh: 340;
+
+  background-image: url("../assets/heroes/wanderer.png");
+}
+
+.hero--archer {
+  --fw: 99;
+  --fh: 85;
+  --fx: 53;
+  --fy: 84;
+  --sw: 1188;
+  --sh: 340;
+
+  background-image: url("../assets/heroes/archer.png");
+}
+
+.hero--assassin {
+  --fw: 94;
+  --fh: 84;
+  --fx: 55;
+  --fy: 82;
+  --sw: 1128;
+  --sh: 336;
+
+  background-image: url("../assets/heroes/assassin.png");
+}
